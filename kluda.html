@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bookmark Collector – with Search</title>
+  </head>
+  <body>
+    <h1>Bookmark Collector</h1>
+    <!-- ==== Add new bookmark ==== -->
+    <div>
+      <input id="titleInput" type="text" placeholder="Title" />
+      <input id="urlInput" type="url" placeholder="https://example.com" />
+      <button>Add Bookmark</button>
+    </div>
+    <hr />
+    <!-- ==== Search box ==== -->
+    <div>
+      <input id="searchInput" type="text" placeholder="Search title or URL…" />
+    </div>
+    <hr />
+    <!-- ==== List of bookmarks ==== -->
+    <ul id="bookmarks"></ul>
+    <script>
+      // ---------- Constants ----------
+      const STORAGE_KEY = "bookmarkCollectorData";
+      // ---------- Persistence ----------
+      function loadBookmarks() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+      }
+      function saveBookmarks(bms) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bms));
+      }
+      // ---------- Rendering ----------
+      // Takes the full bookmark array and the current search term,
+      // then displays only those that match.
+      function render(bookmarksArray, filter = "") {
+        const listEl = document.getElementById("bookmarks");
+        listEl.innerHTML = "";
+        // Normalise filter for case‑insensitive comparison
+        const term = filter.trim().toLowerCase();
+        bookmarks.forEach((bm, index) => {
+          // If a filter is active, skip non‑matching items
+          if (
+            term &&
+            !(
+              bm.title?.toLowerCase().includes(term) ||
+              bm.url.toLowerCase().includes(term)
+            )
+          ) {
+            return; // continue to next bookmark
+          }
+          const li = document.createElement("div");
+          // Clickable link
+          const link = document.createElement("a");
+          link.href = bm.url;
+          link.textContent = bm.title || bm.url;
+          link.target = "_blank";
+          li.appendChild(link);
+          // Delete button
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.style.marginLeft = "10px";
+          delBtn.onclick = () => {
+            bookmarks.splice(index, 1);
+            saveBookmarks(bookmarks);
+            render(bookmarks, document.getElementById("searchInput").value);
+          };
+          li.appendChild(delBtn);
+          listEl.appendChild(li);
+        });
+      }
+      // ---------- Main logic ----------
+      render(bookmarks); // initial render (no filter)
+      // Add bookmark handler
+      document.getElementById().addEventListener("click", () => {
+        const title = document.getElementById("titleInput").value.trim();
+        const urlRaw = document.getElementById("urlInput").value.trim();
+        if (!urlRaw) {
+          alert("Please enter a URL.");
+          return;
+        }
+        // Ensure the URL starts with a protocol
+        const url =
+          urlRaw.startsWith("http://") || urlRaw.startsWith("https://")
+            ? urlRaw
+            : "https://" + urlRaw;
+        bookmarks.push({ title, url });
+        saveBookmarks(bookmarks);
+        render(bookmarks, document.getElementById("searchInput").value);
+        // Clear inputs
+        document.getElementById("titleInput").value = "";
+        document.getElementById("urlInput").value = "";
+      });
+      // Search / filter handler – runs on every keystroke
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        const term = e.target.value;
+        render();
+      });
+    </script>
+  </body>
+</html>
