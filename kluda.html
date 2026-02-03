@@ -10,7 +10,7 @@
     <div>
       <input id="titleInput" type="text" placeholder="Title" />
       <input id="urlInput" type="url" placeholder="https://example.com" />
-      <button>Add Bookmark</button>
+      <button id="saveBt">Add Bookmark</button>
     </div>
     <hr />
     <!-- ==== Search box ==== -->
@@ -19,7 +19,7 @@
     </div>
     <hr />
     <!-- ==== List of bookmarks ==== -->
-    <ul id="bookmarks"></ul>
+    <ul id="bookmarkList"></ul>
     <script>
       // ---------- Constants ----------
       const STORAGE_KEY = "bookmarkCollectorData";
@@ -35,7 +35,7 @@
       // Takes the full bookmark array and the current search term,
       // then displays only those that match.
       function render(bookmarksArray, filter = "") {
-        const listEl = document.getElementById("bookmarks");
+        const listEl = document.getElementById("bookmarkList");
         listEl.innerHTML = "";
         // Normalise filter for case‑insensitive comparison
         const term = filter.trim().toLowerCase();
@@ -71,9 +71,9 @@
         });
       }
       // ---------- Main logic ----------
-      render(bookmarks); // initial render (no filter)
+      // initial render (no filter)
       // Add bookmark handler
-      document.getElementById().addEventListener("click", () => {
+      document.getElementById("saveBt").addEventListener("click", () => {
         const title = document.getElementById("titleInput").value.trim();
         const urlRaw = document.getElementById("urlInput").value.trim();
         if (!urlRaw) {
